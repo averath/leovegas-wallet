@@ -3,15 +3,11 @@ package com.leovegas.wallet.controller
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+import com.leovegas.wallet.IntegrationSpecification
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
-import spock.lang.Specification
 
-@AutoConfigureMockMvc
-@WebMvcTest
-class AccountBalanceControllerIntegrationTest extends Specification {
+class AccountBalanceControllerIntegrationTest extends IntegrationSpecification {
     @Autowired
     private MockMvc mvc
 
