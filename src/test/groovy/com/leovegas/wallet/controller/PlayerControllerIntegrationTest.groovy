@@ -1,6 +1,6 @@
 package com.leovegas.wallet.controller
 
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -19,5 +19,19 @@ class PlayerControllerIntegrationTest extends IntegrationSpecification {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.id').value(1))
                 .andExpect(jsonPath('$.balance').value(0))
+    }
+
+    def "get: '/players/1' when player exists then return that player"() {
+        expect:
+            mvc.perform(get("/players/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('$.id').value(1))
+                .andExpect(jsonPath('$.balance').value(0))
+    }
+
+    def "get: '/players/2' when player does not exist then return 404 not found"() {
+        expect:
+            mvc.perform(get("/players/2"))
+                .andExpect(status().is(404))
     }
 }
