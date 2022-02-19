@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AccountBalanceController {
 
-    @GetMapping
-    public String getBalance() {
+    @GetMapping("/wallet")
+    public String getBalance(Long playerId) {
         return "My balance";
     }
 }
