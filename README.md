@@ -13,8 +13,8 @@ It exposes endpoints for reading the account balance, debit transaction, credit 
 
 To run tests simply run command: `mvn test`
 
-## How to run
-
+## How to run application
+`mvn spring-boot:run` exposes application on http://localhost:8080
 
 ## TODO
 1. Tests - Of course there could be more unit tests and e2e tests
