@@ -49,12 +49,7 @@ public class TransactionController {
         player.setBalance(player.getBalance() + value);
         playerRepository.save(player);
 
-        var transaction = new Transaction();
-        transaction.setId(transactionId);
-        transaction.setPlayerId(playerId);
-        transaction.setValue(value);
-
-        return transactionRepository.save(transaction);
+        return transactionRepository.save(new Transaction(transactionId, playerId, value));
     }
 
     @GetMapping
