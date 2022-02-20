@@ -6,8 +6,7 @@ It exposes endpoints for reading the account balance, debit transaction, credit 
 ## Assumptions
 1. Players can only use one currency.
 2. Neither authorization nor authentication is provided.
-3. No player creation API is not provided so player is created when user wants to store money.
-4. Simplify process by merging DTO with Entity.
+3. Simplify process by merging DTO with Entity.
 
 ## Tests
 
