@@ -35,5 +35,6 @@ one for handling transactions, one for transactions history (which could provide
    2. getPlayer, 
    3. getBalance
 7. Production - to be production ready we should take care about the points above and set up a build process which 
-should check if every dependency is not vulnerable (dependency-check), code is well written (sonarQube), and deploy
+should check if every dependency is not vulnerable (dependency-check), code is well written (sonarQube), and deploy.
+To deploy application on Kubernetes we need to containerize it and provide actuator endpoints.
 8. Commands to run and more description and instruction
