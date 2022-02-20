@@ -1,0 +1,14 @@
+  o                                      o              o
+ <|>                                    <|>            <|>
+ / \                                    < >            < >
+ \o/            o__  __o     o__ __o     \o            o/     o__  __o     o__ __o/     o__ __o/      __o__
+  |            /v      |>   /v     v\     v\          /v     /v      |>   /v     |     /v     |      />  \
+ / \          />      //   />       <\     <\        />     />      //   />     / \   />     / \     \o
+ \o/          \o    o/     \         /       \o    o/       \o    o/     \      \o/   \      \o/      v\
+  |            v\  /v __o   o       o         v\  /v         v\  /v __o   o      |     o      |        <\
+ / \ _\o__/_    <\/> __/>   <\__ __/>          <\/>           <\/> __/>   <\__  < >    <\__  / \  _\o__</
+                                                                                 |
+                                                                         o__     o
+                                                                         <\__ __/>
+${application.title} ${application.version}
+Powered by Spring Boot ${spring-boot.version}
