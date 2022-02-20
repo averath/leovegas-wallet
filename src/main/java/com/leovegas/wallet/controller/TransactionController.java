@@ -1,5 +1,6 @@
 package com.leovegas.wallet.controller;
 
+import java.util.List;
 import javax.transaction.Transactional;
 
 import com.leovegas.wallet.exception.InsufficientAccountBalanceException;
@@ -7,6 +8,7 @@ import com.leovegas.wallet.exception.PlayerNotFoundException;
 import com.leovegas.wallet.model.Transaction;
 import com.leovegas.wallet.repository.PlayerRepository;
 import com.leovegas.wallet.repository.TransactionRepository;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,5 +55,14 @@ public class TransactionController {
         transaction.setValue(value);
 
         return transactionRepository.save(transaction);
+    }
+
+    @GetMapping
+    public List<Transaction> getAllPlayerTransactions(Long playerId) {
+        if (playerRepository.findById(playerId).isPresent()) {
+            return transactionRepository.findAllByPlayerId(playerId);
+        } else {
+            throw new PlayerNotFoundException("Player with given id does not exist");
+        }
     }
 }
