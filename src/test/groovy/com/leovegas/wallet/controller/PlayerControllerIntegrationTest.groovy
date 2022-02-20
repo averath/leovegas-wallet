@@ -7,8 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.leovegas.wallet.IntegrationSpecification
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class PlayerControllerIntegrationTest extends IntegrationSpecification {
     @Autowired
     private MockMvc mvc
@@ -22,6 +24,8 @@ class PlayerControllerIntegrationTest extends IntegrationSpecification {
     }
 
     def "get: '/players/1' when player exists then return that player"() {
+        given:
+            mvc.perform(post("/players"))
         expect:
             mvc.perform(get("/players/1"))
                 .andExpect(status().isOk())

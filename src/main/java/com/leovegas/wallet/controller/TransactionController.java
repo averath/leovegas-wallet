@@ -30,7 +30,7 @@ public class TransactionController {
     public Transaction createTransaction(@PathVariable Long transactionId,
                                          Long playerId,
                                          Long value) {
-        if (value == 0) {
+        if (value == null || value == 0) {
             throw new IllegalArgumentException("Value must be different than 0");
         }
 

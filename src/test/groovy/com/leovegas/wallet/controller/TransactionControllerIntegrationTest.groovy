@@ -84,6 +84,20 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
                 .andExpect(status().is(405))
     }
 
+    def "post: '/transactions' when value is not provided then return 400"() {
+        expect:
+            mvc.perform(post("/transactions/1")
+                .param('playerId', '1'))
+                .andExpect(status().is(400))
+    }
+
+    def "post: '/transactions' when playerId is not provided then return 400"() {
+        expect:
+            mvc.perform(post("/transactions/1")
+                .param('value', '1'))
+                .andExpect(status().is(400))
+    }
+
     def "post: '/transactions/1' when transaction id is not unique then return 400"() {
         given:
             mvc.perform(post("/transactions/1")

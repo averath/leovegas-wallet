@@ -1,6 +1,7 @@
 package com.leovegas.wallet.controller
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 import com.leovegas.wallet.IntegrationSpecification
@@ -11,12 +12,20 @@ class AccountBalanceControllerIntegrationTest extends IntegrationSpecification {
     @Autowired
     private MockMvc mvc
 
-    def "get: '/' when performed then the response has status 200 and content is 'My balance'"() {
+    def "get: '/player/1/balance' returns player balance"() {
+        given:
+            mvc.perform(post('/players'))
         expect:
-            mvc.perform(get("/"))
+            mvc.perform(get("/players/1/balance"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
-                .contentAsString == "My balance"
+                .contentAsString == "0"
+    }
+
+    def "get: '/player/1/balance' when player does not exist then return 404"() {
+        expect:
+            mvc.perform(get("/players/2/balance"))
+                .andExpect(status().is(404))
     }
 }
