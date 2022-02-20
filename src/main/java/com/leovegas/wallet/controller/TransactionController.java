@@ -2,18 +2,20 @@ package com.leovegas.wallet.controller;
 
 import java.util.List;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import com.leovegas.wallet.exception.InsufficientAccountBalanceException;
 import com.leovegas.wallet.exception.PlayerNotFoundException;
 import com.leovegas.wallet.model.Transaction;
+import com.leovegas.wallet.model.dto.TransactionDto;
 import com.leovegas.wallet.repository.PlayerRepository;
 import com.leovegas.wallet.repository.TransactionRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,39 +30,34 @@ public class TransactionController {
         this.playerRepository = playerRepository;
     }
 
-    @PostMapping("/{transactionId}")
+    @PostMapping
     @Transactional
     @Operation(summary = "Withdrawal and credit player account")
-    @ApiResponse(responseCode = "404", description = "Player does not exist")
-    @ApiResponse(responseCode = "400", description = "Wrong value. Probably player does not have enough balance to perform operation")
-    public Transaction createTransaction(
-        @Parameter(name = "transaction id", description = "It has to be unique", example = "1")
-        @PathVariable Long transactionId,
-        @Parameter(name = "player id", description = "Player id. Player has to exist", example = "2")
-            Long playerId,
-        @Parameter(name = "value", description = "Value of operation. Must be different than 0. " +
-            "When lower than 0 then operation is debit otherwise is credit.", example = "3")
-            Long value) {
-        if (value == null || value == 0) {
+    public Transaction createTransaction(@Valid @RequestBody TransactionDto transactionDto) {
+        if (transactionDto.getValue() == 0) {
             throw new IllegalArgumentException("Value must be different than 0");
         }
 
-        if (transactionRepository.findById(transactionId).isPresent()) {
+        if (transactionRepository.findById(transactionDto.getTransactionId()).isPresent()) {
             throw new IllegalArgumentException("Transaction with given id already exists");
         }
 
         var player = playerRepository
-            .findById(playerId)
+            .findById(transactionDto.getPlayerId())
             .orElseThrow(() -> new PlayerNotFoundException("Player with given id does not exist"));
 
-        if (player.getBalance() + value < 0) {
+        if (player.getBalance() + transactionDto.getValue() < 0) {
             throw new InsufficientAccountBalanceException("Player has insufficient account balance");
         }
 
-        player.setBalance(player.getBalance() + value);
+        player.setBalance(player.getBalance() + transactionDto.getValue());
         playerRepository.save(player);
 
-        return transactionRepository.save(new Transaction(transactionId, playerId, value));
+        var transaction = Transaction.builder().id(transactionDto.getTransactionId())
+            .playerId(transactionDto.getPlayerId())
+            .value(transactionDto.getValue()).build();
+
+        return transactionRepository.save(transaction);
     }
 
     @GetMapping

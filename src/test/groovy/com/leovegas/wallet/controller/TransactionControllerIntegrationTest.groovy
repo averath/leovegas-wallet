@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.leovegas.wallet.IntegrationSpecification
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 
@@ -23,9 +24,9 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
         given:
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(0))
         when:
-            def result = mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '2'))
+            def result = mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 2}'))
         then:
             result.andExpect(status().isOk())
                 .andExpect(jsonPath('$.id').value(1))
@@ -36,14 +37,14 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
 
     def "post: '/transactions/1' when value is lower than 0 and player has enough money then subtract value from player wallet"() {
         given:
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '20'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 20}'))
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(20))
         when:
-            def result = mvc.perform(post("/transactions/2")
-                .param('playerId', '1')
-                .param('value', '-1'))
+            def result = mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 2, "playerId": 1, "value": -1}'))
         then:
             result.andExpect(status().isOk())
                 .andExpect(jsonPath('$.id').value(2))
@@ -56,9 +57,9 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
         given:
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(0))
         when:
-            def result = mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '-100'))
+            def result = mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": -100}'))
         then:
             result.andExpect(status().is(400))
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(0))
@@ -68,69 +69,71 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
         given:
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(0))
         when:
-            def result = mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '0'))
+            def result = mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 0}'))
         then:
             result.andExpect(status().is(400))
             mvc.perform(get('/players/1')).andExpect(jsonPath('$.balance').value(0))
     }
 
-    def "post: '/transactions' when transaction id is not provided then return 405"() {
+    def "post: '/transactions' when transaction id is not provided then return 400"() {
         expect:
             mvc.perform(post("/transactions")
-                .param('playerId', '1')
-                .param('value', '10'))
-                .andExpect(status().is(405))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{""playerId": 1, "value": 1}'))
+                .andExpect(status().is(400))
     }
 
     def "post: '/transactions' when value is not provided then return 400"() {
         expect:
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '1'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1}'))
                 .andExpect(status().is(400))
     }
 
     def "post: '/transactions' when playerId is not provided then return 400"() {
         expect:
-            mvc.perform(post("/transactions/1")
-                .param('value', '1'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"playerId": 1, "value": 1}'))
                 .andExpect(status().is(400))
     }
 
     def "post: '/transactions/1' when transaction id is not unique then return 400"() {
         given:
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '10'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 10}'))
         expect:
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '10'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 10}'))
                 .andExpect(status().is(400))
     }
 
     def "post: '/transactions/1' when player does not exist then return 404"() {
         expect:
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '0')
-                .param('value', '10'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 0, "value": 10}'))
                 .andExpect(status().is(404))
     }
 
     def "get: '/transactions' when called then return player's transactions history"() {
         given: "create some transactions"
-            mvc.perform(post("/transactions/1")
-                .param('playerId', '1')
-                .param('value', '10'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 1, "playerId": 1, "value": 10}'))
                 .andExpect(status().isOk())
-            mvc.perform(post("/transactions/2")
-                .param('playerId', '1')
-                .param('value', '100'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 2, "playerId": 1, "value": 100}'))
                 .andExpect(status().isOk())
-            mvc.perform(post("/transactions/3")
-                .param('playerId', '1')
-                .param('value', '1000'))
+            mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{"transactionId": 3, "playerId": 1, "value": 1000}'))
                 .andExpect(status().isOk())
         expect:
             mvc.perform(get('/transactions').param('playerId', '1'))
@@ -149,12 +152,12 @@ class TransactionControllerIntegrationTest extends IntegrationSpecification {
     def "get: '/transactions' when player id does not exist then return 400"() {
         expect:
             mvc.perform(get('/transactions').param('playerId', '-1'))
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().is(404))
     }
 
     def "get: '/transactions' when player id is not provided then return 400"() {
         expect:
             mvc.perform(get('/transactions'))
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().is(400))
     }
 }
